@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   class Invoice extends Model {
     static associate(models) {
       this.belongsTo(models.contacts);
+      this.hasMany(models.invoice_items);
     }
   }
   Invoice.init(
