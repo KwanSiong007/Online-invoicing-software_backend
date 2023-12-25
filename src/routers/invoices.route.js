@@ -18,11 +18,7 @@ class InvoicesRouter {
     );
     this.router.post(
       `${this.path}/add`,
-      this.controller.insertOne.bind(this.controller)
-    );
-    this.router.post(
-      `${this.path}/add`,
-      this.controller.insertInvoiceItems.bind(this.controller)
+      this.controller.insertInvoice.bind(this.controller)
     );
     this.router.get(
       `${this.path}/`,

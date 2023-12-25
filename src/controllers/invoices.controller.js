@@ -4,7 +4,6 @@
 // ADD THE LINK OF PDF IN EMAIL
 // STRIPE IN THIS FILE
 
-// 3ED MODEL IS "invoice_items"
 const { Op } = require("sequelize");
 
 class InvoicesController {
@@ -25,8 +24,8 @@ class InvoicesController {
     }
   }
 
-  // Add new invoice details, in order to create new invoice
-  async insertOne(req, res) {
+  // Add new invoice details in table:invoices & invoice_items, in order to create new invoice
+  async insertInvoice(req, res) {
     const {
       companyName,
       uen,
@@ -36,6 +35,13 @@ class InvoicesController {
       invoiceNumber,
       issueDate,
       dueDate,
+      invoiceItem,
+      description,
+      quantity,
+      priceOfEachItem,
+      totalPrice,
+      gst,
+      totalAmountWithGst,
     } = req.body;
     try {
       // Add new invoice details
@@ -45,10 +51,21 @@ class InvoicesController {
         customer_name: customerName,
         email: email,
         phone: phone,
-        invoice_number: invoiceNumber,
+        invoice_no: invoiceNumber,
         issue_date: issueDate,
         due_date: dueDate,
       });
+      const newInvoiceItems = await this.db.invoice_items.bulkCreate([
+        {
+          invoice_item: invoiceItem,
+          description: description,
+          quantity: quantity,
+          price_of_each_item: priceOfEachItem,
+          total_price: totalPrice,
+          gst: gst,
+          total_amount_with_gst: totalAmountWithGst,
+        },
+      ]);
       // Respond with new invoice details
       return res.json(newInvoice);
     } catch (err) {
@@ -58,7 +75,7 @@ class InvoicesController {
   }
 
   // Add invoice items for every new invoice
-  async insertInvoiceItems(req, res) {
+  /* async insertInvoiceItems(req, res) {
     const {
       invoiceItem,
       description,
@@ -85,7 +102,7 @@ class InvoicesController {
       console.log("error:", err);
       return res.status(400).json({ error: true, msg: err });
     }
-  }
+  } */
 
   async getAll(req, res) {
     try {
