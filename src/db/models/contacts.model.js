@@ -2,13 +2,8 @@
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Contact extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate() {
-      // define association here
+    static associate(models) {
+      this.hasMany(models.invoices);
     }
   }
   Contact.init(
@@ -23,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       customer_name: { type: DataTypes.STRING(255) },
       email: {
         type: DataTypes.STRING(255),
-        // * added validation
-        // validate: {
-        //   isEmail: true,
-        // },
       },
       phone: { type: DataTypes.STRING(255) },
     },
