@@ -27,6 +27,7 @@ class InvoicesController {
   // Add new invoice details in table:invoices & invoice_items, in order to create new invoice
   async insertInvoice(req, res) {
     const {
+      customerID,
       companyName,
       uen,
       customerName,
@@ -46,6 +47,7 @@ class InvoicesController {
     try {
       // Add new invoice details
       const newInvoice = await this.db.invoices.create({
+        customer_id: customerID,
         company_name: companyName,
         uen: uen,
         customer_name: customerName,
@@ -57,6 +59,7 @@ class InvoicesController {
       });
       const newInvoiceItems = await this.db.invoice_items.bulkCreate([
         {
+          invoice_id: newInvoice.id,
           invoice_item: invoiceItem,
           description: description,
           quantity: quantity,
@@ -73,36 +76,6 @@ class InvoicesController {
       return res.status(400).json({ error: true, msg: err });
     }
   }
-
-  // Add invoice items for every new invoice
-  /* async insertInvoiceItems(req, res) {
-    const {
-      invoiceItem,
-      description,
-      quantity,
-      priceOfEachItem,
-      totalPrice,
-      gst,
-      totalAmountWithGst,
-    } = req.body;
-    try {
-      //Add new invoice items
-      const newInvoiceItems = await this.db.invoice_items.bulkCreate({
-        invoice_item: invoiceItem,
-        description: description,
-        quantity: quantity,
-        price_of_each_item: priceOfEachItem,
-        total_price: totalPrice,
-        gst: gst,
-        total_amount_with_gst: totalAmountWithGst,
-      });
-
-      return res.json(newInvoiceItems);
-    } catch (err) {
-      console.log("error:", err);
-      return res.status(400).json({ error: true, msg: err });
-    }
-  } */
 
   async getAll(req, res) {
     try {
