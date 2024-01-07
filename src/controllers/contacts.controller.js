@@ -54,5 +54,25 @@ class ContactsController {
   }
 
   // TODO: EDIT & DELETE
+  async edit(req, res) {
+    //Extracts the data from the request body and assigns it to a variable named newValues.
+    const newValues = req.body;
+    //Extracts the id parameter from the request's parameters and assigns it to a variable named id.
+    const { id } = req.params;
+    //Calls the update function on the database to update contact records.
+    //It awaits the result and extracts the number of updated rows, storing it in rowsUpdatedCount
+    const [rowsUpdatedCount] = await this.db.contacts.update(
+      //Passes the values from newValues as the updated data for the contact record.
+      //Specifies the condition for updating records - it updates the record where the id matches the extracted id from the request parameters.
+      { ...newValues },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    //Sends a JSON response with a status code of 200 (OK) and includes information about the number of rows updated in the database (rowsUpdatedCount).
+    res.status(200).json({ updated: rowsUpdatedCount });
+  }
 }
 module.exports = ContactsController;

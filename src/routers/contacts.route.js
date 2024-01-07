@@ -25,6 +25,10 @@ class ContactsRouter {
       `${this.path}/:company_name`,
       this.controller.findAll.bind(this.controller)
     );
+    this.router.put(
+      `${this.path}/:id`,
+      this.controller.edit.bind(this.controller)
+    );
   };
 }
 module.exports = ContactsRouter;
