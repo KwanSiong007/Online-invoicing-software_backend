@@ -29,6 +29,10 @@ class ContactsRouter {
       `${this.path}/:id`,
       this.controller.edit.bind(this.controller)
     );
+    this.router.delete(
+      `${this.path}/:id`,
+      this.controller.delete.bind(this.controller)
+    );
   };
 }
 module.exports = ContactsRouter;

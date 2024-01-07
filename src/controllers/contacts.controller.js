@@ -53,7 +53,6 @@ class ContactsController {
     }
   }
 
-  // TODO: EDIT & DELETE
   async edit(req, res) {
     //Extracts the data from the request body and assigns it to a variable named newValues.
     const newValues = req.body;
@@ -73,6 +72,13 @@ class ContactsController {
     );
     //Sends a JSON response with a status code of 200 (OK) and includes information about the number of rows updated in the database (rowsUpdatedCount).
     res.status(200).json({ updated: rowsUpdatedCount });
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    const deleted = await this.db.contacts.destroy({ where: { id } });
+    res.status(200).json({ deleted });
   }
 }
 module.exports = ContactsController;
