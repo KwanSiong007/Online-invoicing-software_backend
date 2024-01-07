@@ -25,13 +25,6 @@ module.exports = {
         scale: 2,
         allowNull: false,
       },
-      total_price: { type: Sequelize.DECIMAL, scale: 2, allowNull: false },
-      gst: { type: Sequelize.DECIMAL, scale: 2, allowNull: false },
-      total_amount_with_gst: {
-        type: Sequelize.DECIMAL,
-        scale: 2,
-        allowNull: false,
-      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

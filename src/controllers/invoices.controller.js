@@ -1,7 +1,3 @@
-//! In invoice pg, find customer details.
-//! INCLUDE PDF KIT: insertOne
-//! SAVE THE LINK OF PDF
-// ADD THE LINK OF PDF IN EMAIL
 // STRIPE IN THIS FILE
 
 const { Op } = require("sequelize");
@@ -9,6 +5,8 @@ const PDFDocument = require("pdfkit-table");
 const fs = require("fs");
 const { storage } = require("../firebase");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 const STORAGE_KEY = "pdf-doc/";
 
@@ -42,14 +40,12 @@ class InvoicesController {
       invoiceNumber,
       issueDate,
       dueDate,
-      invoiceItem,
-      description,
-      quantity,
-      priceOfEachItem,
+      invoiceItems,
       totalPrice,
       gst,
       totalAmountWithGst,
     } = req.body;
+
     try {
       // Add new invoice details
       const newInvoice = await this.db.invoices.create({
@@ -62,19 +58,23 @@ class InvoicesController {
         invoice_no: invoiceNumber,
         issue_date: issueDate,
         due_date: dueDate,
+        total_price: totalPrice,
+        gst: gst,
+        total_amount_with_gst: totalAmountWithGst,
       });
-      const newInvoiceItems = await this.db.invoice_items.bulkCreate([
-        {
-          invoice_id: newInvoice.id,
-          invoice_item: invoiceItem,
-          description: description,
-          quantity: quantity,
-          price_of_each_item: priceOfEachItem,
-          total_price: totalPrice,
-          gst: gst,
-          total_amount_with_gst: totalAmountWithGst,
-        },
-      ]);
+
+      // Map invoice items to the format expected by bulkCreate
+      const invoiceItemsData = invoiceItems.map((item) => ({
+        invoice_id: newInvoice.id,
+        invoice_item: item.invoiceItem,
+        description: item.description,
+        quantity: item.quantity,
+        price_of_each_item: item.priceOfEachItem,
+      }));
+
+      const newInvoiceItems = await this.db.invoice_items.bulkCreate(
+        invoiceItemsData
+      );
 
       // initializes a new PDF document using PDFKit.
       const pdfDoc = new PDFDocument();
@@ -100,10 +100,14 @@ class InvoicesController {
           "Quantity",
           "Price Of Each Item",
         ],
-        rows: [
-          [invoiceItem, description, quantity, priceOfEachItem],
-          // Add more rows here as needed
-        ],
+
+        // Map over invoiceItems and return an array of values for each item
+        rows: invoiceItems.map((item) => [
+          item.invoiceItem,
+          item.description,
+          item.quantity,
+          item.priceOfEachItem,
+        ]),
       };
 
       // This line instructs the PDF document (pdfDoc) to create a table using the data specified in the table object.
@@ -131,6 +135,29 @@ class InvoicesController {
         await newInvoice.update({ pdf_url: url });
         //Synchronously deletes the local PDF file using the Node.js File System (fs) module. This is done after uploading to storage to clean up local resources.
         fs.unlinkSync(pdfPath);
+
+        let transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.SENDER_EMAIL,
+            pass: process.env.APP_PASSWORD,
+          },
+        });
+
+        let mailOptions = {
+          from: process.env.SENDER_EMAIL,
+          to: email,
+          subject: `Invoice_${invoiceNumber}_${issueDate}`,
+          text: `Hi ${customerName},\n\nPlease find the attached PDF download link for the invoice: ${url}.\n\nThe outstanding amount of $${totalAmountWithGst} is kindly requested to be settled by ${dueDate}.\n\nThank you so much!\n\nBest regards,\nDemo Company`,
+        };
+
+        transporter.sendMail(mailOptions, function (err, data) {
+          if (err) {
+            console.log("Error occurs", err);
+          } else {
+            console.log("Email sent successfully");
+          }
+        });
         return res.json({ url });
       });
 

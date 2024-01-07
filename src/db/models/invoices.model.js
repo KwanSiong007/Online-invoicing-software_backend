@@ -25,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       invoice_no: { type: DataTypes.STRING(255) },
       issue_date: { type: DataTypes.DATE },
       due_date: { type: DataTypes.DATE },
+      total_price: { type: DataTypes.DECIMAL },
+      gst: { type: DataTypes.DECIMAL },
+      total_amount_with_gst: { type: DataTypes.DECIMAL },
       pdf_url: { type: DataTypes.STRING(255) },
     },
     {

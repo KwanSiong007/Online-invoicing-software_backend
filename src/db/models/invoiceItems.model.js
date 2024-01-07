@@ -20,9 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       description: { type: DataTypes.STRING(255) },
       quantity: { type: DataTypes.INTEGER },
       price_of_each_item: { type: DataTypes.DECIMAL },
-      total_price: { type: DataTypes.DECIMAL },
-      gst: { type: DataTypes.DECIMAL },
-      total_amount_with_gst: { type: DataTypes.DECIMAL },
     },
     {
       sequelize,
