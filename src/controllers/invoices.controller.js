@@ -7,6 +7,7 @@ const { storage } = require("../firebase");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+//const stripe = require("stripe")(process.env.STRIPE_TEST_SECRET_KEY);
 
 const STORAGE_KEY = "pdf-doc/";
 
@@ -93,7 +94,13 @@ class InvoicesController {
       pdfDoc.text(`Due Date: ${dueDate}`);
       pdfDoc.moveDown();
       // Define the table
-      const table = {
+      pdfDoc.text(`Company Name: ${companyName}`);
+      pdfDoc.text(`UEN: ${uen}`);
+      pdfDoc.text(`Customer name: ${customerName}`);
+      pdfDoc.text(`Email: ${email}`);
+      pdfDoc.text(`Phone: ${phone}`);
+      pdfDoc.moveDown();
+      const ItemTable = {
         headers: [
           "Invoice Item",
           "Description",
@@ -114,10 +121,14 @@ class InvoicesController {
       // prepareHeader is an option that defines how the table headers should be styled before they are added to the PDF.
       // pdfDoc.fillColor("#444") sets the text color of the headers to a dark gray (#444).
       // #fff is the hexadecimal code for white, so this line makes the background of the table rows white.
-      await pdfDoc.table(table, {
+      await pdfDoc.table(ItemTable, {
         prepareHeader: () => pdfDoc.fontSize(12).fillColor("#444"),
         fillColor: "#fff",
       });
+      pdfDoc.moveDown();
+      pdfDoc.text(`Total Price: ${totalPrice}`);
+      pdfDoc.text(`Add GST 9%: ${gst}`);
+      pdfDoc.text(`Total Amount with GST: ${totalAmountWithGst}`);
       //...other invoice details
       pdfDoc.end();
 
